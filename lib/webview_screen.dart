@@ -237,127 +237,129 @@ class _WebviewScreenState extends State<WebviewScreen> {
   Widget build(BuildContext context) {
     return SizedBox(
       height: MediaQuery.of(context).size.height * 0.75,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          GestureDetector(
-            onTap: () {
-              Navigator.pop(context);
-            },
-            child: Container(
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            GestureDetector(
+              onTap: () {
+                Navigator.pop(context);
+              },
+              child: Container(
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.black,
+                ),
+                padding: const EdgeInsets.all(4),
+                child: const Icon(
+                  Icons.close_rounded,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            Container(
+              height: MediaQuery.of(context).size.height * 0.67,
+              width: MediaQuery.of(context).size.width * 0.8,
               decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.black,
+                borderRadius: BorderRadius.all(Radius.circular(10.0)),
               ),
-              padding: const EdgeInsets.all(4),
-              child: const Icon(
-                Icons.close_rounded,
-                color: Colors.white,
-              ),
-            ),
-          ),
-          Container(
-            height: MediaQuery.of(context).size.height * 0.67,
-            width: MediaQuery.of(context).size.width * 0.8,
-            decoration: const BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(10.0)),
-            ),
-            child: isGranted
-                ? InAppWebView(
-                    initialData: InAppWebViewInitialData(
-                      baseUrl: Uri.parse("https://widget.dojah.io"),
-                      androidHistoryUrl: Uri.parse("https://widget.dojah.io"),
-                      mimeType: "text/html",
-                      data: """
-                            <html lang="en">
-                              <head>
-                                  <meta charset="UTF-8">
-                                      <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, shrink-to-fit=1"/>
-                                    
-                                  <title>Dojah Inc.</title>
-                              </head>
-                              <body >
-                             <script src="https://widget.dojah.io/widget.js"></script>
-    
-                            
-                              <script>
-                                        const options = {
-                                            app_id: "${widget.appId}",
-                                            p_key: "${widget.publicKey}",
-                                            type: "${widget.type}",
-                                            config: ${json.encode(widget.config ?? {})},
-                                            user_data: ${json.encode(widget.userData ?? {})},
-                                            gov_data: ${json.encode(widget.govData ?? {})},
-                                            location: ${json.encode(locationObject ?? {})},
-                                            metadata: ${json.encode(widget.metaData ?? {})},
-                                            amount: ${widget.amount},
-                                            reference_id: ${widget.referenceId},
-                                            onSuccess: function (response) {
-                                            window.flutter_inappwebview.callHandler('onSuccessCallback', response)
-                                            },
-                                            onError: function (err) {
-                                              window.flutter_inappwebview.callHandler('onErrorCallback', error)
-                                            },
-                                            onClose: function () {
-                                              window.flutter_inappwebview.callHandler('onCloseCallback', 'close')
-                                            }
-                                        }
-                                          const connect = new Connect(options);
-                                          connect.setup();
-                                          connect.open();
-                                    </script>
-                              </body>
-                            </html>
-                        """,
+              child: isGranted
+                  ? InAppWebView(
+                      initialData: InAppWebViewInitialData(
+                        baseUrl: Uri.parse("https://widget.dojah.io"),
+                        androidHistoryUrl: Uri.parse("https://widget.dojah.io"),
+                        mimeType: "text/html",
+                        data: """
+                              <html lang="en">
+                                <head>
+                                    <meta charset="UTF-8">
+                                        <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, shrink-to-fit=1"/>
+                                      
+                                    <title>Dojah Inc.</title>
+                                </head>
+                                <body >
+                               <script src="https://widget.dojah.io/widget.js"></script>
+            
+                              
+                                <script>
+                                          const options = {
+                                              app_id: "${widget.appId}",
+                                              p_key: "${widget.publicKey}",
+                                              type: "${widget.type}",
+                                              config: ${json.encode(widget.config ?? {})},
+                                              user_data: ${json.encode(widget.userData ?? {})},
+                                              gov_data: ${json.encode(widget.govData ?? {})},
+                                              location: ${json.encode(locationObject ?? {})},
+                                              metadata: ${json.encode(widget.metaData ?? {})},
+                                              amount: ${widget.amount},
+                                              reference_id: ${widget.referenceId},
+                                              onSuccess: function (response) {
+                                              window.flutter_inappwebview.callHandler('onSuccessCallback', response)
+                                              },
+                                              onError: function (err) {
+                                                window.flutter_inappwebview.callHandler('onErrorCallback', error)
+                                              },
+                                              onClose: function () {
+                                                window.flutter_inappwebview.callHandler('onCloseCallback', 'close')
+                                              }
+                                          }
+                                            const connect = new Connect(options);
+                                            connect.setup();
+                                            connect.open();
+                                      </script>
+                                </body>
+                              </html>
+                          """,
+                      ),
+                      initialUrlRequest:
+                          URLRequest(url: Uri.parse("https://widget.dojah.io")),
+                      initialOptions: options,
+                      onWebViewCreated: (controller) {
+                        _webViewController = controller;
+
+                        _webViewController?.addJavaScriptHandler(
+                          handlerName: 'onSuccessCallback',
+                          callback: (response) {
+                            widget.success(response);
+                          },
+                        );
+
+                        _webViewController?.addJavaScriptHandler(
+                          handlerName: 'onCloseCallback',
+                          callback: (response) {
+                            widget.close(response);
+                            // if (response.first == 'close') {
+                            //   Navigator.pop(context);
+                            // }
+                          },
+                        );
+
+                        _webViewController?.addJavaScriptHandler(
+                          handlerName: 'onErrorCallback',
+                          callback: (error) {
+                            widget.error(error);
+                          },
+                        );
+                      },
+                      androidOnGeolocationPermissionsShowPrompt:
+                          (controller, origin) async {
+                        return GeolocationPermissionShowPromptResponse(
+                            allow: true, retain: true, origin: origin);
+                      },
+                      androidOnPermissionRequest:
+                          (controller, origin, resources) async {
+                        return PermissionRequestResponse(
+                            resources: resources,
+                            action: PermissionRequestResponseAction.GRANT);
+                      },
+                    )
+                  : WaitingScreen(
+                      image: widget.image,
                     ),
-                    initialUrlRequest:
-                        URLRequest(url: Uri.parse("https://widget.dojah.io")),
-                    initialOptions: options,
-                    onWebViewCreated: (controller) {
-                      _webViewController = controller;
-
-                      _webViewController?.addJavaScriptHandler(
-                        handlerName: 'onSuccessCallback',
-                        callback: (response) {
-                          widget.success(response);
-                        },
-                      );
-
-                      _webViewController?.addJavaScriptHandler(
-                        handlerName: 'onCloseCallback',
-                        callback: (response) {
-                          widget.close(response);
-                          // if (response.first == 'close') {
-                          //   Navigator.pop(context);
-                          // }
-                        },
-                      );
-
-                      _webViewController?.addJavaScriptHandler(
-                        handlerName: 'onErrorCallback',
-                        callback: (error) {
-                          widget.error(error);
-                        },
-                      );
-                    },
-                    androidOnGeolocationPermissionsShowPrompt:
-                        (controller, origin) async {
-                      return GeolocationPermissionShowPromptResponse(
-                          allow: true, retain: true, origin: origin);
-                    },
-                    androidOnPermissionRequest:
-                        (controller, origin, resources) async {
-                      return PermissionRequestResponse(
-                          resources: resources,
-                          action: PermissionRequestResponseAction.GRANT);
-                    },
-                  )
-                : WaitingScreen(
-                    image: widget.image,
-                  ),
-          ),
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }

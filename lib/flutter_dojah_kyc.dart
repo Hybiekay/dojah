@@ -33,6 +33,7 @@ class DojahKYC {
     Function(dynamic error)? onError,
     Color? icBackgroundColor,
     Color? iconColor,
+    Widget? image,
   }) async {
     showDialog(
         context: context,
@@ -43,6 +44,7 @@ class DojahKYC {
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10.0)),
               content: WebviewScreen(
+                image: image,
                 icBackgroundColor: icBackgroundColor,
                 iconColor: iconColor,
                 appId: appId,
