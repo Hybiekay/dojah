@@ -1,6 +1,12 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 
 class WaitingScreen extends StatefulWidget {
+  final Widget? image;
+  const WaitingScreen({
+    Key? key,
+    this.image,
+  }) : super(key: key);
   @override
   _WaitingScreenState createState() => _WaitingScreenState();
 }
@@ -47,9 +53,10 @@ class _WaitingScreenState extends State<WaitingScreen>
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SlideTransition(
-                position: logoOffsetAnimation, child: FlutterLogo()),
-            SizedBox(height: 20),
-            Text('Please wait...'),
+                position: logoOffsetAnimation,
+                child: widget.image ?? const FlutterLogo()),
+            const SizedBox(height: 20),
+            const Text('Please wait...'),
           ],
         ),
       ),

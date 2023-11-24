@@ -10,6 +10,7 @@ import 'waiting_screen.dart';
 //import 'package:geolocator/geolocator.dart';
 
 class WebviewScreen extends StatefulWidget {
+  final Widget? image;
   final String appId;
   final String publicKey;
   final String type;
@@ -40,6 +41,7 @@ class WebviewScreen extends StatefulWidget {
     required this.close,
     this.icBackgroundColor = Colors.purple,
     this.iconColor = Colors.white,
+    this.image,
   }) : super(key: key);
 
   @override
@@ -351,7 +353,9 @@ class _WebviewScreenState extends State<WebviewScreen> {
                           action: PermissionRequestResponseAction.GRANT);
                     },
                   )
-                : WaitingScreen(),
+                : WaitingScreen(
+                    image: widget.image,
+                  ),
           ),
         ],
       ),
